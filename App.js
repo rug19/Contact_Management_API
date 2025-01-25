@@ -6,7 +6,7 @@ async function initializeDb() {
       await sequelize.authenticate();
       console.log("Conexão bem sucedida");
     } catch (error) {
-      console.log("Fala ao se conectar com banco", error);
+      console.log("Falha ao se conectar com banco", error);
     }
   }
   
