@@ -4,8 +4,8 @@ import sequelize from "./db.js";
 export async function initializeDb() {
   try {
     await sequelize.authenticate();
-    console.log("Conexão bem sucedida");
+    console.log('Connection to the database has been established successfully.');
   } catch (error) {
-    console.log("Falha ao se conectar com banco", error);
+    console.log('Unable to connect to the database:', error);
   }
 }
