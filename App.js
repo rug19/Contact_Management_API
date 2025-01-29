@@ -1,13 +1,5 @@
-import sequelize from "./config/dataBase.js";
+import { initializeDb } from "./src/config/initializeDb.js";
+import { syncModel } from "./src/models/syncModel.js";
 
-//Function to conect to db
-async function initializeDb() {
-    try {
-      await sequelize.authenticate();
-      console.log("Conexão bem sucedida");
-    } catch (error) {
-      console.log("Falha ao se conectar com banco", error);
-    }
-  }
-  
-  initializeDb();
+initializeDb();
+syncModel();
