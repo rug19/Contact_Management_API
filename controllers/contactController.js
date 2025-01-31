@@ -1,9 +1,9 @@
-import Contact from "../models/contact";
-import coreController from "./coreController";
+import contacts from "../models/contacts.js";
+import coreController from "./coreController.js";
 
 class ContactController extends coreController {
   constructor() {
-    super(Contact);
+    super(contacts);
   }
 }
 

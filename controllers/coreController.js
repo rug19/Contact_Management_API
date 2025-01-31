@@ -3,18 +3,18 @@ export default class coreController {
     this.model = model;
   }
 
-  async getAll(req, res) {
+  getAll = async (req, res) => {
     try {
       const items = await this.model.findAll();
       res.json(items);
     } catch (error) {
       res.status(500).json({ error: error.messagem });
     }
-  }
+  };
 
-  async getById(req, res) {
+  getById = async (req, res) => {
     try {
-      const item = await this.model.findByPK(req.params.id);
+      const item = await this.model.findByPk(req.params.id);
       if (!item) {
         return res.status(404).json({ error: "Item not found" });
       }
@@ -22,20 +22,22 @@ export default class coreController {
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
-  }
+  };
 
-  async create(req, res) {
+  create = async (req, res) => {
     try {
-      const newItem = await this.model.creat(req.body);
+      console.log("Model:", this.model);
+      const newItem = await this.model.create(req.body);
       res.status(201).json(newItem);
+      console.log("Contact sucssfuly create");
     } catch (error) {
       res.status(400).json({ error: error.message });
     }
-  }
+  };
 
-  async update(req, res) {
+  update = async (req, res) => {
     try {
-      const item = await this.model.findByPK(req.params.id);
+      const item = await this.model.findByPk(req.params.id);
       if (!item) {
         return res.status(404).json({ error: "Item not found" });
       }
@@ -44,18 +46,19 @@ export default class coreController {
     } catch (error) {
       res.status(400).json({ error: error.message });
     }
-  }
+  };
 
-  async delete(req, res) {
+  delete = async (req, res) => {
     try {
-      const item = await this.model.findByPK(req.params.id);
+      const item = await this.model.findByPk(req.params.id);
       if (!item) {
         res.status(404).json({ error: "Item not found" });
       }
       await item.destroy();
       res.status(204).send();
+      console.log("Contato deletado com sucesso!");
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
-  }
+  };
 }
