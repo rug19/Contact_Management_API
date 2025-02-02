@@ -1,12 +1,13 @@
 import express from "express";
 import ContactController from "../controllers/contactController.js";
+import { validationCreate } from "../controllers/coreController.js";
 
 const contactController = new ContactController();
 
 const router = express.Router(); //Create um router from express
 
 //Route to create a new contact
-router.post("/contacts", contactController.create);
+router.post("/contacts", validationCreate, contactController.create);
 //Route to get all the contacts
 router.get("/contacts", contactController.getAll);
 //Route to get the contact by id

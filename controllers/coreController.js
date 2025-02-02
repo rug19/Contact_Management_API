@@ -1,5 +1,11 @@
 import { body, validationResult } from "express-validator";
-
+import { where } from "sequelize";
+//Define the validaton out of the  class
+export const validationCreate = [
+  body("name").notEmpty().withMessage("O nome é obrigatório."),
+  body("phone").notEmpty().withMessage("Telefone é obrigatório"),
+  body("email").notEmpty().isEmail().withMessage("O email deve ser válido"),
+];
 export default class coreController {
   constructor(model) {
     this.model = model;
@@ -27,9 +33,22 @@ export default class coreController {
   };
 
   create = async (req, res) => {
+    const errors = validationResult(req); //Verify if there are any errors
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() }); //Return the errors
+    }
     try {
-      console.log("Model:", this.model);
-      const newItem = await this.model.create(req.body);
+      const { name, phone, email } = req.body;
+
+      //Verify if already has the same  email in the database
+      if (email) {
+        const existingEmail = await this.model.findOne({ where: { email } });
+        if (existingEmail) {
+          return res.status(400).json({ message: "Email já cadastrado" });
+        }
+      }
+      //Create a  new contact
+      const newItem = await this.model.create({ name, phone, email });
       res.status(201).json(newItem);
       console.log("Contact sucssfuly create");
     } catch (error) {
