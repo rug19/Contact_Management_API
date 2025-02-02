@@ -1,3 +1,5 @@
+import { body, validationResult } from "express-validator";
+
 export default class coreController {
   constructor(model) {
     this.model = model;
