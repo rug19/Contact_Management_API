@@ -1,7 +1,7 @@
 import { body, validationResult } from "express-validator";
-import { where } from "sequelize";
+
 //Define the validaton out of the  class
-export const validationCreate = [
+export const DataValidation = [
   body("name").notEmpty().withMessage("O nome é obrigatório."),
   body("phone").notEmpty().withMessage("Telefone é obrigatório"),
   body("email").notEmpty().isEmail().withMessage("O email deve ser válido"),
@@ -57,12 +57,27 @@ export default class coreController {
   };
 
   update = async (req, res) => {
+    const errors = validationResult(req); //Verify if there are any errors
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() }); //Return the errors
+    }
     try {
+      const { name, phone, email } = req.body;
+
+      //Verify if already has the same  email in the database
+      if (email) {
+        const existingEmail = await this.model.findOne({ where: { email } });
+        if (existingEmail) {
+          return res.status(400).json({ message: "Email já cadastrado" });
+        }
+      }
+
+      //Update the contact
       const item = await this.model.findByPk(req.params.id);
       if (!item) {
         return res.status(404).json({ error: "Item not found" });
       }
-      await item.update(req.body);
+      await item.update({ name, phone, email });
       res.json(item);
     } catch (error) {
       res.status(400).json({ error: error.message });
