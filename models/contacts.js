@@ -3,7 +3,7 @@ import sequelize from "../config/db.js";
 
 //Difine the model contact
 const contacts = sequelize.define(
-  "contacts",
+  "contacts", //specify the table's name
   {
     id: {
       type: DataTypes.UUID, //Random ID
