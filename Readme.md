@@ -85,6 +85,7 @@ Dependencies
 
 Ensure the following dependencies are installed in your project:
 
+````
 "devDependencies": {
   "@babel/core": "^7.26.7",
   "@babel/preset-env": "^7.26.7",
@@ -94,10 +95,14 @@ Ensure the following dependencies are installed in your project:
   "sequelize-mock": "^0.10.2",
   "supertest": "^7.0.0"
 }
+
+````
  
 ## Babel Configuration
 
 Create a babel.config.cjs file in the root directory with the following content:
+
+````
 
 // babel.config.cjs
 module.exports = {
@@ -106,9 +111,12 @@ module.exports = {
   ]
 };
 
+````
 ## jest Configuration
 
 Add the Jest configuration to your package.json:
+
+````
 
 {
   "scripts": {
@@ -121,6 +129,7 @@ Add the Jest configuration to your package.json:
   }
 }
 
+````
 ## Running Tests
 
 To run the tests, use the following command:
@@ -133,6 +142,7 @@ npm test
 
 Here is an example of a unit test for the UserController:
 
+````
 // tests/user.test.js
 import UserController from '../controllers/userController.js';
 import { jest } from '@jest/globals';
@@ -167,7 +177,7 @@ describe('UserController', () => {
   });
 });
 
-
+````
 
 ## Contribution
 
