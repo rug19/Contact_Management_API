@@ -2,6 +2,7 @@ import { body, validationResult } from "express-validator";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import dotenv from "dotenv";
+import UserService from "../service/userService.js";
 
 dotenv.config();
 
@@ -16,6 +17,8 @@ export const UserValidation = [
   body("email").notEmpty().isEmail().withMessage("O email deve ser válido"),
   body("password").notEmpty().withMessage("Senha obrigatória"),
 ];
+
+const userService = new UserService();
 export default class coreController {
   constructor(model) {
     this.model = model;
@@ -118,14 +121,8 @@ export default class coreController {
     try {
       const { name, email, password } = req.body;
 
-      //Verify if alredy exist email
-      const existingUser = await this.model.findOne({ where: { email } });
-      if (existingUser) {
-        return res.status(400).json({ error: "E-mail já cadastrado." });
-      }
-
       //Create a new user
-      const user = await this.model.create({ name, email, password });
+      const user = await this.model.register({ name, email, password });
       res
         .status(201)
         .json({ message: "Usuário registrado com sucesso.", user });
