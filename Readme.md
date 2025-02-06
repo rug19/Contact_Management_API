@@ -77,6 +77,98 @@ To start the development server, use:
 npm run dev
 ```
 
+## Testing
+
+Test Environment Configuration
+
+Dependencies
+
+Ensure the following dependencies are installed in your project:
+
+"devDependencies": {
+  "@babel/core": "^7.26.7",
+  "@babel/preset-env": "^7.26.7",
+  "babel-jest": "^29.7.0",
+  "jest": "^29.7.0",
+  "nodemon": "^3.1.9",
+  "sequelize-mock": "^0.10.2",
+  "supertest": "^7.0.0"
+}
+ 
+## Babel Configuration
+
+Create a babel.config.cjs file in the root directory with the following content:
+
+// babel.config.cjs
+module.exports = {
+  presets: [
+    ['@babel/preset-env', { targets: { node: 'current' } }]
+  ]
+};
+
+## jest Configuration
+
+Add the Jest configuration to your package.json:
+
+{
+  "scripts": {
+    "test": "jest"
+  },
+  "jest": {
+    "transform": {
+      "^.+\\.jsx?$": "babel-jest"
+    }
+  }
+}
+
+## Running Tests
+
+To run the tests, use the following command:
+
+```bash
+npm test
+```
+
+## Example Unit Test
+
+Here is an example of a unit test for the UserController:
+
+// tests/user.test.js
+import UserController from '../controllers/userController.js';
+import { jest } from '@jest/globals';
+
+const userController = new UserController();
+
+describe('UserController', () => {
+  describe('getAll', () => {
+    it('should return all users', async () => {
+      const req = {};
+      const res = {
+        status: jest.fn().mockReturnThis(),
+        json: jest.fn(),
+      };
+
+      const users = [
+        { id: 1, name: 'User 1', email: 'user1@example.com' },
+        { id: 2, name: 'User 2', email: 'user2@example.com' },
+      ];
+      jest.spyOn(userController, 'getAll').mockImplementation((req, res) => {
+        res.status(200).json(users);
+      });
+
+      await userController.getAll(req, res);
+
+      console.log('Status:', res.status.mock.calls);
+      console.log('JSON:', res.json.mock.calls);
+
+      expect(res.status).toHaveBeenCalledWith(200);
+      expect(res.json).toHaveBeenCalledWith(users);
+    });
+  });
+});
+
+
+
 ## Contribution
 
 Contributions are welcome! Follow these steps to contribute:
