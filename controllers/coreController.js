@@ -114,45 +114,42 @@ export default class coreController {
   //Methods to register and login the user
 
   register = async (req, res) => {
+    console.log("Recebendo requisição:", req.body); // Verifica se os dados estão corretos
+
     const errors = validationResult(req); //Verify if there are any errors
     if (!errors.isEmpty()) {
+      console.log("Erros de validação:", errors.array());
+
       return res.status(400).json({ errors: errors.array() }); //Return the errors
     }
     try {
       const { name, email, password } = req.body;
+      console.log("Chamando userService.register com:", name, email, password);
 
       //Create a new user
-      const user = await this.model.register({ name, email, password });
+      const user = await userService.register(name, email, password);
+
       res
         .status(201)
         .json({ message: "Usuário registrado com sucesso.", user });
     } catch (error) {
+      console.error("Erro no controller register:", error);
+      if (error.message.includes("E-mail já cadastrado")) {
+        return res.status(400).json({ error: error.message });
+      }
       res.status(500).json({ error: "Erro ao registrar o usuário" });
     }
   };
 
   login = async (req, res) => {
+    const { email, password } = req.body;
     try {
-      const { email, password } = req.body;
-      //Verify if the user already exist
-      const user = await this.model.findOne({ where: { email } });
-      if (!user) {
-        return res.status(400).json({ error: "E-mail ou senha incorretos." });
-      }
-
-      //Verify  the password is correct
-      const isMatch = await user.comparePassword(password);
-      if (!isMatch) {
-        return res.status(400).json({ error: "Email ou senha incorretos" });
-      }
-
-      //Generate the token JWT
-      const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
-        expiresIn: "1h",
-      });
-      res.status(200).json({ token });
-    } catch {
-      res.status(500).json({ error: "Erro ao autenticar o usuário. " });
+      const result = await userService.login(email, password);
+      res
+        .status(200)
+        .json({ message: "Usuário autenticado com sucesso", result });
+    } catch (error) {
+      res.status(401).json({ message: error.message });
     }
   };
 }

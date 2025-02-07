@@ -1,15 +1,18 @@
 import user from "../models/user.js";
+import bcrypt from "bcryptjs";
 
-export default class UserRepository {
+class UserRepository {
   constructor() {
     this.model = user;
   }
 
-  async register(name, email, password) {
-    return await this.model.register({name, email, password});
+  async create(useData) {
+    return await this.model.create(useData);
   }
 
-  async login(email, password) {
-    return await this.model.login({email, password});
+  async findByEmail(email) {
+    return await this.model.findOne({ where: { email } });
   }
 }
+
+export default UserRepository;
