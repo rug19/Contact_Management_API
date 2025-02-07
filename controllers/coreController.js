@@ -25,7 +25,7 @@ export default class coreController {
   getAll = async (res) => {
     try {
       const items = await contactService.getAll();
-      res.json(items);
+      res.status(200).json(items);
     } catch (error) {
       res.status(500).json({ error: error.messagem });
     }
@@ -33,11 +33,9 @@ export default class coreController {
 
   getById = async (req, res) => {
     try {
-      const item = await this.model.findByPk(req.params.id);
-      if (!item) {
-        return res.status(404).json({ error: "Item not found" });
-      }
-      res.json(item);
+      const item = await contactService.getById(req.params.id);
+
+      res.status(200).json(item);
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
