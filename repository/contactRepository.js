@@ -1,6 +1,6 @@
 import contacts from "../models/contacts.js";
 
-export default class ContactRepository {
+class ContactRepository {
   constructor() {
     this.model = contacts;
   }
@@ -11,6 +11,9 @@ export default class ContactRepository {
 
   async findById(id) {
     return await this.model.findByPk(id);
+  }
+  async findByEmail(email) {
+    return await this.model.findOne({ where: { email } });
   }
 
   async create(data) {
@@ -25,3 +28,5 @@ export default class ContactRepository {
     return await this.model.delete(id, data, { where: { id } });
   }
 }
+
+export default ContactRepository;

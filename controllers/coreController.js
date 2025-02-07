@@ -3,6 +3,7 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import dotenv from "dotenv";
 import UserService from "../service/userService.js";
+import ContactService from "../service/contactService.js";
 
 dotenv.config();
 
@@ -19,14 +20,11 @@ export const UserValidation = [
 ];
 
 const userService = new UserService();
+const contactService = new ContactService();
 export default class coreController {
-  constructor(model) {
-    this.model = model;
-  }
-
-  getAll = async (req, res) => {
+  getAll = async (res) => {
     try {
-      const items = await this.model.findAll();
+      const items = await contactService.getAll();
       res.json(items);
     } catch (error) {
       res.status(500).json({ error: error.messagem });
@@ -46,23 +44,17 @@ export default class coreController {
   };
 
   create = async (req, res) => {
-    const errors = validationResult(req); //Verify if there are any errors
+    //Verify if there are any errors
+    const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() }); //Return the errors
     }
     try {
       const { name, phone, email } = req.body;
 
-      //Verify if already has the same  email in the database
-      if (email) {
-        const existingEmail = await this.model.findOne({ where: { email } });
-        if (existingEmail) {
-          return res.status(400).json({ message: "Email já cadastrado" });
-        }
-      }
       //Create a  new contact
-      const newItem = await this.model.create({ name, phone, email });
-      res.status(201).json(newItem);
+      const newContact = await contactService.create(name, phone, email);
+      res.status(201).json(newContact);
       console.log("Contact sucssfuly create");
     } catch (error) {
       res.status(400).json({ error: error.message });
