@@ -22,7 +22,7 @@ export const UserValidation = [
 const userService = new UserService();
 const contactService = new ContactService();
 export default class coreController {
-  getAll = async (res) => {
+  getAll = async (req, res) => {
     try {
       const items = await contactService.getAll();
       res.status(200).json(items);
