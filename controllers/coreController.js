@@ -2,6 +2,8 @@ import { body, validationResult } from "express-validator";
 import jwt from "jsonwebtoken";
 import bcrypt from "bcryptjs";
 import dotenv from "dotenv";
+import UserService from "../service/userService.js";
+import ContactService from "../service/contactService.js";
 
 dotenv.config();
 
@@ -16,15 +18,14 @@ export const UserValidation = [
   body("email").notEmpty().isEmail().withMessage("O email deve ser válido"),
   body("password").notEmpty().withMessage("Senha obrigatória"),
 ];
-export default class coreController {
-  constructor(model) {
-    this.model = model;
-  }
 
+const userService = new UserService();
+const contactService = new ContactService();
+export default class coreController {
   getAll = async (req, res) => {
     try {
-      const items = await this.model.findAll();
-      res.json(items);
+      const items = await contactService.getAll();
+      res.status(200).json(items);
     } catch (error) {
       res.status(500).json({ error: error.messagem });
     }
@@ -32,34 +33,26 @@ export default class coreController {
 
   getById = async (req, res) => {
     try {
-      const item = await this.model.findByPk(req.params.id);
-      if (!item) {
-        return res.status(404).json({ error: "Item not found" });
-      }
-      res.json(item);
+      const item = await contactService.getById(req.params.id);
+
+      res.status(200).json(item);
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
   };
 
   create = async (req, res) => {
-    const errors = validationResult(req); //Verify if there are any errors
+    //Verify if there are any errors
+    const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() }); //Return the errors
     }
     try {
       const { name, phone, email } = req.body;
 
-      //Verify if already has the same  email in the database
-      if (email) {
-        const existingEmail = await this.model.findOne({ where: { email } });
-        if (existingEmail) {
-          return res.status(400).json({ message: "Email já cadastrado" });
-        }
-      }
       //Create a  new contact
-      const newItem = await this.model.create({ name, phone, email });
-      res.status(201).json(newItem);
+      const newContact = await contactService.create(name, phone, email);
+      res.status(201).json(newContact);
       console.log("Contact sucssfuly create");
     } catch (error) {
       res.status(400).json({ error: error.message });
@@ -74,20 +67,12 @@ export default class coreController {
     try {
       const { name, phone, email } = req.body;
 
-      //Verify if already has the same  email in the database
-      if (email) {
-        const existingEmail = await this.model.findOne({ where: { email } });
-        if (existingEmail) {
-          return res.status(400).json({ message: "Email já cadastrado" });
-        }
-      }
-
-      //Update the contact
-      const item = await this.model.findByPk(req.params.id);
-      if (!item) {
-        return res.status(404).json({ error: "Item not found" });
-      }
-      await item.update({ name, phone, email });
+      const item = await contactService.update(
+        req.params.id,
+        name,
+        phone,
+        email
+      );
       res.json(item);
     } catch (error) {
       res.status(400).json({ error: error.message });
@@ -96,13 +81,8 @@ export default class coreController {
 
   delete = async (req, res) => {
     try {
-      const item = await this.model.findByPk(req.params.id);
-      if (!item) {
-        res.status(404).json({ error: "Item not found" });
-      }
-      await item.destroy();
-      res.status(204).send();
-      console.log("Contato deletado com sucesso!");
+      const item = await contactService.delete(req.params.id);
+      res.json(item);
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
@@ -111,51 +91,42 @@ export default class coreController {
   //Methods to register and login the user
 
   register = async (req, res) => {
+    console.log("Recebendo requisição:", req.body); // Verifica se os dados estão corretos
+
     const errors = validationResult(req); //Verify if there are any errors
     if (!errors.isEmpty()) {
+      console.log("Erros de validação:", errors.array());
+
       return res.status(400).json({ errors: errors.array() }); //Return the errors
     }
     try {
       const { name, email, password } = req.body;
-
-      //Verify if alredy exist email
-      const existingUser = await this.model.findOne({ where: { email } });
-      if (existingUser) {
-        return res.status(400).json({ error: "E-mail já cadastrado." });
-      }
+      console.log("Chamando userService.register com:", name, email, password);
 
       //Create a new user
-      const user = await this.model.create({ name, email, password });
+      const user = await userService.register(name, email, password);
+
       res
         .status(201)
         .json({ message: "Usuário registrado com sucesso.", user });
     } catch (error) {
+      console.error("Erro no controller register:", error);
+      if (error.message.includes("E-mail já cadastrado")) {
+        return res.status(400).json({ error: error.message });
+      }
       res.status(500).json({ error: "Erro ao registrar o usuário" });
     }
   };
 
   login = async (req, res) => {
+    const { email, password } = req.body;
     try {
-      const { email, password } = req.body;
-      //Verify if the user already exist
-      const user = await this.model.findOne({ where: { email } });
-      if (!user) {
-        return res.status(400).json({ error: "E-mail ou senha incorretos." });
-      }
-
-      //Verify  the password is correct
-      const isMatch = await user.comparePassword(password);
-      if (!isMatch) {
-        return res.status(400).json({ error: "Email ou senha incorretos" });
-      }
-
-      //Generate the token JWT
-      const token = jwt.sign({ id: user.id }, process.env.JWT_SECRET, {
-        expiresIn: "1h",
-      });
-      res.status(200).json({ token });
-    } catch {
-      res.status(500).json({ error: "Erro ao autenticar o usuário. " });
+      const result = await userService.login(email, password);
+      res
+        .status(200)
+        .json({ message: "Usuário autenticado com sucesso", result });
+    } catch (error) {
+      res.status(401).json({ message: error.message });
     }
   };
 }
