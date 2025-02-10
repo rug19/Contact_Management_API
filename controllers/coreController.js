@@ -67,20 +67,12 @@ export default class coreController {
     try {
       const { name, phone, email } = req.body;
 
-      //Verify if already has the same  email in the database
-      if (email) {
-        const existingEmail = await this.model.findOne({ where: { email } });
-        if (existingEmail) {
-          return res.status(400).json({ message: "Email já cadastrado" });
-        }
-      }
-
-      //Update the contact
-      const item = await this.model.findByPk(req.params.id);
-      if (!item) {
-        return res.status(404).json({ error: "Item not found" });
-      }
-      await item.update({ name, phone, email });
+      const item = await contactService.update(
+        req.params.id,
+        name,
+        phone,
+        email
+      );
       res.json(item);
     } catch (error) {
       res.status(400).json({ error: error.message });
@@ -89,13 +81,8 @@ export default class coreController {
 
   delete = async (req, res) => {
     try {
-      const item = await this.model.findByPk(req.params.id);
-      if (!item) {
-        res.status(404).json({ error: "Item not found" });
-      }
-      await item.destroy();
-      res.status(204).send();
-      console.log("Contato deletado com sucesso!");
+      const item = await contactService.delete(req.params.id);
+      res.json(item);
     } catch (error) {
       res.status(500).json({ error: error.message });
     }
