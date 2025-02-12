@@ -1,4 +1,4 @@
-import UserController from "../controllers/userController.js";
+import UserController from "../../controllers/userController.js";
 import { jest } from "@jest/globals";
 
 const userController = new UserController();

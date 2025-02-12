@@ -1,6 +1,4 @@
 import { body, validationResult } from "express-validator";
-import jwt from "jsonwebtoken";
-import bcrypt from "bcryptjs";
 import dotenv from "dotenv";
 import UserService from "../service/userService.js";
 import ContactService from "../service/contactService.js";
@@ -10,12 +8,22 @@ dotenv.config();
 export const DataValidation = [
   body("name").notEmpty().withMessage("O nome é obrigatório."),
   body("phone").notEmpty().withMessage("Telefone é obrigatório"),
-  body("email").notEmpty().isEmail().withMessage("O email deve ser válido"),
+  body("email")
+    .notEmpty()
+    .withMessage("O campo email é obrigatório")
+    .bail()
+    .isEmail()
+    .withMessage("O email deve ser válido"),
 ];
 
 export const UserValidation = [
   body("name").notEmpty().withMessage("O nome é obrigatório."),
-  body("email").notEmpty().isEmail().withMessage("O email deve ser válido"),
+  body("email")
+    .notEmpty()
+    .withMessage("O campo email é obrigatório")
+    .bail()
+    .isEmail()
+    .withMessage("O email deve ser válido"),
   body("password").notEmpty().withMessage("Senha obrigatória"),
 ];
 
@@ -27,7 +35,7 @@ export default class coreController {
       const items = await contactService.getAll();
       res.status(200).json(items);
     } catch (error) {
-      res.status(500).json({ error: error.messagem });
+      res.status(500).json({ error: error.message });
     }
   };
 
@@ -53,7 +61,7 @@ export default class coreController {
       //Create a  new contact
       const newContact = await contactService.create(name, phone, email);
       res.status(201).json(newContact);
-      console.log("Contact sucssfuly create");
+      console.log("Contato criado com sucesso");
     } catch (error) {
       res.status(400).json({ error: error.message });
     }
@@ -91,8 +99,6 @@ export default class coreController {
   //Methods to register and login the user
 
   register = async (req, res) => {
-    console.log("Recebendo requisição:", req.body); // Verifica se os dados estão corretos
-
     const errors = validationResult(req); //Verify if there are any errors
     if (!errors.isEmpty()) {
       console.log("Erros de validação:", errors.array());
