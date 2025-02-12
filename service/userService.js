@@ -7,9 +7,7 @@ dotenv.config();
 
 class UserService {
   async register(name, email, password) {
-    console.log("🔹 Dados antes da criação:", { name, email, password });
     try {
-      console.log("Verificando se o email já existe:", email);
 
       //Verify of the email is already exist in the database
       const existingEmail = await userRepository.findByEmail(email);
@@ -47,7 +45,7 @@ class UserService {
       console.log("Usuario cadastrando com sucesso");
       return token;
     } catch (error) {
-      throw new Error(`Erro ao autenticar usuário${error.message}`);
+      throw new Error(`Erro ao autenticar usuário, ${error.message}`);
     }
   }
 }

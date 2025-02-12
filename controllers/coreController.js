@@ -1,23 +1,9 @@
-import { body, validationResult } from "express-validator";
-import jwt from "jsonwebtoken";
-import bcrypt from "bcryptjs";
+import { validationResult } from "express-validator";
 import dotenv from "dotenv";
 import UserService from "../service/userService.js";
 import ContactService from "../service/contactService.js";
 
 dotenv.config();
-
-export const DataValidation = [
-  body("name").notEmpty().withMessage("O nome é obrigatório."),
-  body("phone").notEmpty().withMessage("Telefone é obrigatório"),
-  body("email").notEmpty().isEmail().withMessage("O email deve ser válido"),
-];
-
-export const UserValidation = [
-  body("name").notEmpty().withMessage("O nome é obrigatório."),
-  body("email").notEmpty().isEmail().withMessage("O email deve ser válido"),
-  body("password").notEmpty().withMessage("Senha obrigatória"),
-];
 
 const userService = new UserService();
 const contactService = new ContactService();
@@ -27,7 +13,7 @@ export default class coreController {
       const items = await contactService.getAll();
       res.status(200).json(items);
     } catch (error) {
-      res.status(500).json({ error: error.messagem });
+      res.status(500).json({ error: error.message });
     }
   };
 
@@ -52,8 +38,10 @@ export default class coreController {
 
       //Create a  new contact
       const newContact = await contactService.create(name, phone, email);
-      res.status(201).json(newContact);
-      console.log("Contact sucssfuly create");
+
+      res
+        .status(201)
+        .json({ message: "Contato criado com sucesso", newContact });
     } catch (error) {
       res.status(400).json({ error: error.message });
     }
@@ -73,7 +61,7 @@ export default class coreController {
         phone,
         email
       );
-      res.json(item);
+      res.status(200).json({ message: "Contato atualizado com sucesso", item });
     } catch (error) {
       res.status(400).json({ error: error.message });
     }
@@ -81,18 +69,16 @@ export default class coreController {
 
   delete = async (req, res) => {
     try {
-      const item = await contactService.delete(req.params.id);
-      res.json(item);
+      await contactService.delete(req.params.id);
+      res.status(200).json({ message: "Contato deletado com sucesso" });
     } catch (error) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: "Erro ao deletar contato" });
     }
   };
 
   //Methods to register and login the user
 
   register = async (req, res) => {
-    console.log("Recebendo requisição:", req.body); // Verifica se os dados estão corretos
-
     const errors = validationResult(req); //Verify if there are any errors
     if (!errors.isEmpty()) {
       console.log("Erros de validação:", errors.array());
@@ -106,9 +92,7 @@ export default class coreController {
       //Create a new user
       const user = await userService.register(name, email, password);
 
-      res
-        .status(201)
-        .json({ message: "Usuário registrado com sucesso.", user });
+      res.status(201).json({ message: "Usuário registrado com sucesso." });
     } catch (error) {
       console.error("Erro no controller register:", error);
       if (error.message.includes("E-mail já cadastrado")) {

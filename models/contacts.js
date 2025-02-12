@@ -1,19 +1,19 @@
 import { DataTypes } from "sequelize";
 import sequelize from "../config/db.js";
+import moment from "moment";
 
-//Difine the model contact
 const contacts = sequelize.define(
-  "contacts", //specify the table's name
+  "contacts",
   {
     id: {
-      type: DataTypes.UUID, //Random ID
-      defaultValue: DataTypes.UUIDV4, //Generate a ID automatically
-      primaryKey: true, //Define with primary Key
+      type: DataTypes.UUID,
+      defaultValue: DataTypes.UUIDV4,
+      primaryKey: true,
     },
 
     name: {
       type: DataTypes.STRING,
-      allowNull: false, //Don't allow null values
+      allowNull: false,
     },
     phone: {
       type: DataTypes.STRING,
@@ -21,12 +21,27 @@ const contacts = sequelize.define(
     },
     email: {
       type: DataTypes.STRING,
-      allowNull: false, //Allow null values
+      allowNull: false,
+    },
+    createdAt: {
+      type: DataTypes.DATE,
+    },
+    updatedAt: {
+      type: DataTypes.DATE,
     },
   },
   {
-    timestamps: true, // Sequelize cria automaticamente createdAt e updatedAt
+    timestamps: true,
   }
 );
+
+// Formata as datas ao converter para JSON
+contacts.prototype.toJSON = function () {
+  return {
+    ...this.get(),
+    createdAt: moment(this.createdAt).format("DD-MM-YYYY HH:mm:ss"),
+    updatedAt: moment(this.updatedAt).format("DD-MM-YYYY HH:mm:ss"),
+  };
+};
 
 export default contacts;
