@@ -11,9 +11,9 @@ const swaggerOptions = {
   definition: {
     openapi: "3.0.0",
     info: {
-      title: "API de Gerenciamento de Contatos",
+      title: "Contacts Manangement API",
       version: "1.0.0",
-      description: " API para gerenciar contatos",
+      description: " An API for managing contacts",
     },
     servers: [
       {

@@ -1,31 +1,9 @@
-import { body, validationResult } from "express-validator";
+import { validationResult } from "express-validator";
 import dotenv from "dotenv";
 import UserService from "../service/userService.js";
 import ContactService from "../service/contactService.js";
 
 dotenv.config();
-
-export const DataValidation = [
-  body("name").notEmpty().withMessage("O nome é obrigatório."),
-  body("phone").notEmpty().withMessage("Telefone é obrigatório"),
-  body("email")
-    .notEmpty()
-    .withMessage("O campo email é obrigatório")
-    .bail()
-    .isEmail()
-    .withMessage("O email deve ser válido"),
-];
-
-export const UserValidation = [
-  body("name").notEmpty().withMessage("O nome é obrigatório."),
-  body("email")
-    .notEmpty()
-    .withMessage("O campo email é obrigatório")
-    .bail()
-    .isEmail()
-    .withMessage("O email deve ser válido"),
-  body("password").notEmpty().withMessage("Senha obrigatória"),
-];
 
 const userService = new UserService();
 const contactService = new ContactService();
@@ -81,7 +59,7 @@ export default class coreController {
         phone,
         email
       );
-      res.json(item);
+      res.status(200).json({ message: "Contato atualizado com sucesso", item });
     } catch (error) {
       res.status(400).json({ error: error.message });
     }
@@ -89,10 +67,10 @@ export default class coreController {
 
   delete = async (req, res) => {
     try {
-      const item = await contactService.delete(req.params.id);
-      res.json(item);
+      await contactService.delete(req.params.id);
+      res.status(200).json({ message: "Contato deletado com sucesso" });
     } catch (error) {
-      res.status(500).json({ error: error.message });
+      res.status(500).json({ error: "Erro ao deletar contato" });
     }
   };
 
