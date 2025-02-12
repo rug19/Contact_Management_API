@@ -11,6 +11,10 @@ The **Contact Management API** is a RESTful API that allows users to manage thei
 - **Get Contact by ID**: Fetch details of a specific contact.
 - **Update Contact**: Modify an existing contact's information.
 - **Delete Contact**: Remove a contact from the system.
+- **User Registration**: Register a new user.
+- **User Login**: Authenticate a user and obtain a token.
+
+
 
 ## Technologies Used
 
@@ -59,15 +63,30 @@ DB_DIALECT=mysql
 
 ## API Endpoints
 
+The API documentation is available via Swagger. To access the Swagger UI, start the application and navigate to:
+
+````
+http://localhost:3000/api-docs
+
+````
+
+### User Endpoints
+
+| Method | Endpoint            | Description                             |
+|--------|---------------------|-----------------------------------------|
+| POST   | `auth/register`     | Register a new user                     |
+| POST   | `auth/login`        | Authenticate  a user and obtain a token |
+
+
 ### Contact Endpoints
 
 | Method | Endpoint            | Description                     |
 |--------|---------------------|---------------------------------|
-| GET    | `/contacts`         | Retrieve all contacts          |
-| POST   | `/contacts`         | Create a new contact           |
-| GET    | `/contacts/{id}`    | Retrieve a specific contact    |
-| PUT    | `/contacts/{id}`    | Update a specific contact      |
-| DELETE | `/contacts/{id}`    | Delete a specific contact      |
+| GET    | `api/contacts`         | Retrieve all contacts          |
+| POST   | `api/contacts`         | Create a new contact           |
+| GET    | `api/contacts/{id}`    | Retrieve a specific contact    |
+| PUT    | `api/contacts/{id}`    | Update a specific contact      |
+| DELETE | `api/contacts/{id}`    | Delete a specific contact      |
 
 ## Usage
 

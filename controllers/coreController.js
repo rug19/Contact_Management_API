@@ -38,8 +38,10 @@ export default class coreController {
 
       //Create a  new contact
       const newContact = await contactService.create(name, phone, email);
-      res.status(201).json(newContact);
-      console.log("Contato criado com sucesso");
+
+      res
+        .status(201)
+        .json({ message: "Contato criado com sucesso", newContact });
     } catch (error) {
       res.status(400).json({ error: error.message });
     }
@@ -90,9 +92,7 @@ export default class coreController {
       //Create a new user
       const user = await userService.register(name, email, password);
 
-      res
-        .status(201)
-        .json({ message: "Usuário registrado com sucesso.", user });
+      res.status(201).json({ message: "Usuário registrado com sucesso." });
     } catch (error) {
       console.error("Erro no controller register:", error);
       if (error.message.includes("E-mail já cadastrado")) {
